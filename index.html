@@ -34,6 +34,7 @@
       netlifyIdentity.on("login", (user) => {
         const token = user.token.access_token; // Access the authentication token
         const githubAccessToken = user.token.github.access_token;
+        console.log("Github Token", githubAccessToken);
         // Use the token for making authenticated requests
       });
     </script>
