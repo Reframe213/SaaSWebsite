@@ -21,12 +21,17 @@ document.getElementById('repoForm').addEventListener('submit', async function (e
         
         // Get the Netlify Identity token
         const netlifyToken = user.token.access_token;
+        // Get the GitHub access token from the authenticated user
+        const githubAccessToken = user.token.github.access_token;
+
+// Use the GitHub access token for GitHub API requests
+
 
         // Step 1: Create the GitHub repository
         const repoResponse = await fetch('https://api.github.com/user/repos', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${netlifyToken}`, // Use the Netlify Identity token
+                'Authorization': `Bearer ${githubAccessToken}`, // Use the Netlify Identity token
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
@@ -50,7 +55,7 @@ document.getElementById('repoForm').addEventListener('submit', async function (e
             const uploadResponse = await fetch(`https://api.github.com/repos/${repoData.owner.login}/${repoName}/contents/${file.name}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${netlifyToken}`, // Use the Netlify Identity token
+                    'Authorization': `Bearer ${githubAccessToken}`, // Use the Netlify Identity token
                     'Accept': 'application/vnd.github.v3+json',
                     'Content-Type': 'application/json'
                 },
