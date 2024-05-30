@@ -33,7 +33,7 @@
       // Listen for login event
       netlifyIdentity.on("login", (user) => {
         const token = user.token.access_token; // Access the authentication token
-        console.log("Token: ", access_token);
+        console.log("Token: ", token);
         // Use the token for making authenticated requests
       });
     </script>
