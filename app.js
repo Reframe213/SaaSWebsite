@@ -2,6 +2,8 @@
 netlifyIdentity.on('init', user => {
     if (user) {
       showProtectedContent();
+    } else {
+      hideProtectedContent();
     }
   });
   
@@ -40,8 +42,15 @@ netlifyIdentity.on('init', user => {
     document.getElementById('protectedContent').style.display = 'none';
   }
   
+  // Event listener for form submission
   document.getElementById('repoForm').addEventListener('submit', async function (e) {
     e.preventDefault();
+  
+    const user = netlifyIdentity.currentUser();
+    if (!user) {
+      alert('You must be logged in to submit the form.');
+      return;
+    }
   
     const repoName = document.getElementById('repoName').value;
     const file = document.getElementById('file').files[0];
@@ -53,10 +62,12 @@ netlifyIdentity.on('init', user => {
   
     try {
       // Step 1: Create the GitHub repository
+      const token = await user.jwt(); // Get the JWT token
       const repoResponse = await fetch('/.netlify/functions/create-github-repo', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ repoName })
       });
@@ -75,7 +86,8 @@ netlifyIdentity.on('init', user => {
         const uploadResponse = await fetch('/.netlify/functions/upload-file-to-github', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             repoName,
@@ -94,7 +106,8 @@ netlifyIdentity.on('init', user => {
         const netlifyResponse = await fetch('/.netlify/functions/create-netlify-site', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ repoName })
         });
