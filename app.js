@@ -9,22 +9,14 @@ document.getElementById('repoForm').addEventListener('submit', async function (e
         return;
     }
 
-    const githubToken = process.env.GITHUB_PAT;
-    const netlifyToken = process.env.NETLIFY_PAT;
-
     try {
         // Step 1: Create the GitHub repository
-        const repoResponse = await fetch('https://api.github.com/user/repos', {
+        const repoResponse = await fetch('/.netlify/functions/create-github-repo', {
             method: 'POST',
             headers: {
-                'Authorization': `token ${githubToken}`,
-                'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                name: repoName,
-                private: true
-            })
+            body: JSON.stringify({ repoName })
         });
 
         const repoData = await repoResponse.json();
@@ -38,16 +30,15 @@ document.getElementById('repoForm').addEventListener('submit', async function (e
         reader.onload = async function () {
             const content = btoa(reader.result);
 
-            const uploadResponse = await fetch(`https://api.github.com/repos/Reframe213/${repoName}/contents/${file.name}`, {
-                method: 'PUT',
+            const uploadResponse = await fetch('/.netlify/functions/upload-file-to-github', {
+                method: 'POST',
                 headers: {
-                    'Authorization': `token ${githubToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message: 'Initial commit',
-                    content: content
+                    repoName,
+                    fileName: file.name,
+                    content
                 })
             });
 
@@ -58,21 +49,12 @@ document.getElementById('repoForm').addEventListener('submit', async function (e
             }
 
             // Step 3: Create a new Netlify site using the GitHub repository
-            const netlifyResponse = await fetch('https://api.netlify.com/api/v1/sites', {
+            const netlifyResponse = await fetch('/.netlify/functions/create-netlify-site', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${netlifyToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    name: `${repoName}-site`, // Optional, Netlify will auto-generate a name if not provided
-                    repo: {
-                        provider: 'github',
-                        repo: `Reframe213/${repoName}`,
-                        private: false,
-                        branch: 'main'
-                    }
-                })
+                body: JSON.stringify({ repoName })
             });
 
             const netlifyData = await netlifyResponse.json();
