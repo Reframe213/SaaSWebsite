@@ -4,10 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Upload to GitHub</title>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
-    <button onclick="openLoginModal()">Log In / Sign Up</button>
     <h1>Create a New GitHub Repository and Upload Files</h1>
     <form id="repoForm">
       <label for="repoName">Repository Name:</label>
@@ -20,22 +18,5 @@
     </form>
 
     <script src="app.js"></script>
-    <script>
-      // Initialize Netlify Identity
-      const netlifyIdentity = window.netlifyIdentity;
-      netlifyIdentity.init();
-
-      // Open login modal
-      function openLoginModal() {
-        netlifyIdentity.open("login");
-      }
-
-      // Listen for login event
-      netlifyIdentity.on("login", (user) => {
-        const token = user.token.access_token; // Access the authentication token
-        console.log("Token: ", token);
-        // Use the token for making authenticated requests
-      });
-    </script>
   </body>
 </html>
